@@ -11,7 +11,7 @@ DATABASE_NAME = os.getenv("DATABASE_NAME")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD")
 
 
-DATABASE_URL = f"postgresql+asyncpg://{DATABASE_HOST}:{DATABASE_PASSWORD}@{DATABASE_HOST}/{DATABASE_NAME}"
+DATABASE_URL = f"postgresql+asyncpg://{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}/{DATABASE_NAME}"
 
 # Create async engine
 engine = create_async_engine(DATABASE_URL, echo=True)
@@ -29,4 +29,4 @@ async def get_db():
     async with AsyncSessionLocal() as session:
         yield session
 
-get_db()
+# get_db()

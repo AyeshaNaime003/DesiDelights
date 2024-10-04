@@ -2,3 +2,4 @@ env/
 server/ngrok.exe
 server/ngrok_authentication.txt
 server/.env
+server/__pycache__
