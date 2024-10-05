@@ -10,6 +10,9 @@ class OrderDetails(Base):
     quantity = Column(Integer)
     total_price = Column(Numeric(10, 2))
 
+    def __repr__(self):
+        return f"OrderDetails(id={self.order_id}, item_id={self.item_id}, quantity={self.quantity}, total_price={self.total_price})"
+
 class Order(Base):
     __tablename__ = 'orders'  # Ensure the table name matches your SQL definition
 

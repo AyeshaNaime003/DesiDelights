@@ -17,16 +17,28 @@ async def handle_dialogflow_request(request: Request, session: AsyncSession = De
     payload = await request.json()
     # webhookStatus = payload["webhookStatus"]["message"]
     intent = payload["queryResult"]["intent"]["displayName"]
+    parameters = payload["queryResult"]["parameters"]
     if intent=="ongoing-tracking.provide_id":
-        results = await get_order_details(session)
-        print(type(results))
-        print(results)
-        return {"message":"sucess ongoing-tracking.provide_id"}
+        results = await get_order_details(session, parameters)
+        # Let's assume results contain some order details you want to send back
+        if results:
+            # Building a response in Dialogflow format
+            fulfillment_text = f"Here are your order details: {results}"
+            return JSONResponse(content={
+                "fulfillmentText": fulfillment_text,  # Dialogflow expects 'fulfillmentText' field for response
+            })
+        else:
+            return JSONResponse(content={
+                "fulfillmentText": "Sorry, I couldn't find any details for your order.",
+            })
+
     
-async def get_order_details(session: AsyncSession):
+async def get_order_details(session: AsyncSession, parameters: dict):
     try:
         # Execute the select statement to get all order details
-        result = await session.execute(select(OrderDetails))
+        order_id = parameters.get("number")
+        query = select(OrderDetails).where(OrderDetails.order_id == order_id)
+        result = await session.execute(query)
         order_details = result.scalars().all()  # Fetch all rows
 
         return order_details  # This will be a list of OrderDetails instances

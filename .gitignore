@@ -1,5 +1,5 @@
 env/
 server/ngrok.exe
-server/ngrok_authentication.txt
+server/ngrok.yml
 server/.env
 server/__pycache__
