@@ -18,8 +18,8 @@ INSERT INTO menu_items (name, description, price) VALUES
 ('Rasmalai', 'One bowl of rasmalai with 3 dumplings', 200),
 ('Naan', 'Fresh Naan', 30),
 ('Paratha', 'Lachedar Paratha', 50),
-('Cold Drink', 'Bottle of Pepsi', 75),
-('Cold Lassi', 'Glass of Fresh Chilled Lassi', 100);
+('Soft Drink', 'Bottle of Pepsi', 75),
+('Lassi', 'Glass of Fresh Chilled Lassi', 100);
 
 --
 -- Table structure for table `orders`
