@@ -28,13 +28,15 @@ INSERT INTO menu_items (name, description, price) VALUES
 DROP TABLE IF EXISTS orders;
 CREATE TABLE orders (
   order_id SERIAL PRIMARY KEY,
-  status VARCHAR(255) CHECK (status IN ('in transit', 'delivered'))
+  bill DECIMAL(10,2), 
+  status VARCHAR(255) CHECK (status IN ('cooking','delivering','delivered'))
 );
 
 -- Inserting data into the orders table
-INSERT INTO orders (status) VALUES 
-('delivered'),
-('in transit');
+INSERT INTO orders (bill, status) VALUES 
+(1400, 'cooking'),
+(1300, 'delivering'),
+(435, 'delivered');
 
 --
 -- Table structure for table `orders_details`
@@ -53,11 +55,9 @@ CREATE TABLE orders_details (
 
 -- Inserting data into the orders_details table
 INSERT INTO orders_details (order_id, item_id, quantity, total_price) VALUES 
-(1, 1, 2, 800),
-(1, 3, 1, 600),
-(2, 4, 3, 600),
-(2, 6, 2, 100),
-(2, 3, 1, 600);
+(1, 1, 2, 800),(1, 3, 1, 600),
+(2, 4, 3, 600),(2, 6, 2, 100),(2, 3, 1, 600),
+(3, 2, 1, 300),(3, 5, 2, 60),(3, 7, 1, 75);
 
 -- Function to get price for an item
 DROP FUNCTION IF EXISTS get_price_for_item;
