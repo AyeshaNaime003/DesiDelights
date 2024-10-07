@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
-from model import OrderDetails
 import db_utils
 import utils
 
@@ -15,6 +14,7 @@ async def ongoing_tracking_provide_id(parameters: dict, session: AsyncSession):
     return f"Order {order_id} is {order_status}" if order_status else "Sorry, couldn't find any details for your order."
 
 async def ongoing_order_add(parameters: dict, session: AsyncSession):
+    global ongoing_orders
     menu_items = parameters["menu-items"]
     quantities = parameters["number"]
     
@@ -25,17 +25,29 @@ async def ongoing_order_add(parameters: dict, session: AsyncSession):
         new_menu = dict(zip(menu_items, quantities))
         print(new_menu)
         if session_id in ongoing_orders.keys():
-            print('existing session id, adding new items')
             ongoing_orders[session_id].update(new_menu)
         else:
-            print('new session id ')
-            ongoing_orders[session_id] = new_menu
-        
-        print('\n\n'+str(ongoing_orders)+'\n\n')
+            ongoing_orders[session_id] = new_menu    
+        print(f"\n\n{ongoing_orders}\n\n")
         return f"Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
     
-async def ongoing_order_delete():
-    pass
+async def ongoing_order_delete(parameters: dict, session: AsyncSession):
+    global ongoing_orders
+    session_id = parameters["session_id"].split('/')[-1]
+    menu_items = list(parameters["menu-items"])
+    print(ongoing_orders)
+    print(session_id)
+    if session_id in ongoing_orders.keys():
+        existing_menu = ongoing_orders[session_id]
+        for menu_item in menu_items:
+            _ = existing_menu.pop(menu_item)
+        ongoing_orders[session_id] = ongoing_orders[session_id]
+        return f"Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
+    else:
+        return "Sorry had problem finding your order? Can you please repeat the order"
+
+
+
 async def ongoing_order_finalize():
     pass
 
@@ -55,7 +67,7 @@ async def root():
 @app.post("/")
 async def handle_dialogflow_request(request: Request, session: AsyncSession = Depends(get_db)):
     payload = await request.json()
-    print('\n\n'+str(payload)+"\n\n")
+    # print('\n\n'+str(payload)+"\n\n")
     intent = payload["queryResult"]["intent"]["displayName"]
     parameters = payload["queryResult"]["parameters"]
     parameters["session_id"] = payload["session"]
