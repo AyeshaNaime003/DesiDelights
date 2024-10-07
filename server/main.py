@@ -5,17 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 from model import OrderDetails
 import db_utils
+import utils
 
 ongoing_orders = {}
-
-def format_order(order_dictionary):
-    formatted_order = []
-    for i, q in order_dictionary.items():
-        formatted_order.append(f"{int(q)} {i}")
-    formatted_order = ', '.join(formatted_order)
-    return formatted_order
         
-
 async def ongoing_tracking_provide_id(parameters: dict, session: AsyncSession):
     order_id = int(parameters["number"])
     order_status = await db_utils.get_order_status(order_id, session)
@@ -29,16 +22,17 @@ async def ongoing_order_add(parameters: dict, session: AsyncSession):
         return "Please specify quanity for each item" 
     else: 
         session_id = parameters["session_id"].split('/')[-1]
-        current_session_order = ongoing_orders.get(session_id, {})
-        if len(current_session_order)==0:
-            print('new session id ')
-        else:
+        new_menu = dict(zip(menu_items, quantities))
+        print(new_menu)
+        if session_id in ongoing_orders.keys():
             print('existing session id, adding new items')
-        for quantity,menu_item in zip(quantities, menu_items):
-            current_session_order[menu_item] = quantity
-        ongoing_orders[session_id] = current_session_order  
+            ongoing_orders[session_id].update(new_menu)
+        else:
+            print('new session id ')
+            ongoing_orders[session_id] = new_menu
+        
         print('\n\n'+str(ongoing_orders)+'\n\n')
-        return f"Order uptil now is {format_order(current_session_order)}. Anything else?"
+        return f"Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
     
 async def ongoing_order_delete():
     pass
