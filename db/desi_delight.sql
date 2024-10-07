@@ -13,6 +13,7 @@ CREATE TABLE menu_items (
 -- Inserting data into the menu_items table
 INSERT INTO menu_items (name, description, price) VALUES 
 ('Biryani', 'One large plate of Sindhi Biryani with 2 chicken pieces.', 400),
+('Nihari', 'One large plate of Beef Nihari with 2 chicken pieces.', 400),
 ('Daal Makhni', 'One large plate of Daal Makhni', 300),
 ('Chicken Karahi', 'One large plate full of Chicken Karahi', 600),
 ('Rasmalai', 'One bowl of rasmalai with 3 dumplings', 200),
@@ -36,7 +37,7 @@ CREATE TABLE orders (
 INSERT INTO orders (bill, status) VALUES 
 (1400, 'cooking'),
 (1300, 'delivering'),
-(435, 'delivered');
+(535, 'delivered');
 
 --
 -- Table structure for table `orders_details`
@@ -57,7 +58,7 @@ CREATE TABLE orders_details (
 INSERT INTO orders_details (order_id, item_id, quantity, total_price) VALUES 
 (1, 1, 2, 800),(1, 3, 1, 600),
 (2, 4, 3, 600),(2, 6, 2, 100),(2, 3, 1, 600),
-(3, 2, 1, 300),(3, 5, 2, 60),(3, 7, 1, 75);
+(3, 2, 1, 400),(3, 5, 2, 60),(3, 7, 1, 75);
 
 -- Function to get price for an item
 DROP FUNCTION IF EXISTS get_price_for_item;
