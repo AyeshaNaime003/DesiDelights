@@ -88,7 +88,7 @@ async def ongoing_order_finalize(parameters: dict, session: AsyncSession):
     return (
         f"Your order for {formatted_order} has been successfully placed!\n"
         f"Order ID: {order_id}\n"
-        f"Total Bill: ${total_bill:.2f}\n"
+        f"Total Bill: PKR{total_bill:.2f}\n"
         "Your order is now being cooked and will be delivered within 20-30 minutes. "
         "Please keep the cash ready for the delivery. Thank you for choosing us!"
     )
