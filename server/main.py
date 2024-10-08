@@ -12,16 +12,20 @@ ongoing_orders = {}
 async def ongoing_tracking_provide_id(parameters: dict, session: AsyncSession):
     order_id = int(parameters["number"])
     order_status = await db_utils.get_order_status(order_id, session)
-    return f"Order {order_id} is {order_status}" if order_status else "Sorry, couldn't find any details for your order."
+    return (
+        f"Order Id {order_id} is currently {order_status}. Thank you for your patience!" 
+        if order_status else 
+        "I'm sorry, but I couldn't find any details for your order. Please check the ID and try again."
+    )
 
 
-async def ongoing_order_add(parameters: dict, session: AsyncSession):
+def ongoing_order_add(parameters: dict):
     global ongoing_orders
     menu_items = parameters["menu-items"]
     quantities = parameters["number"]
     
     if len(menu_items)!=len(quantities):
-        return "Please specify quanity for each item" 
+        return "Could you please provide a quantity for each item? Example one plate of Biryani"
     else: 
         session_id = parameters["session_id"].split('/')[-1]
         new_menu = dict(zip(menu_items, quantities))
@@ -31,24 +35,40 @@ async def ongoing_order_add(parameters: dict, session: AsyncSession):
         else:
             ongoing_orders[session_id] = new_menu    
         print(f"\n\n{ongoing_orders}\n\n")
-        return f"Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
+        return f"Items added Successfully. Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
     
 
-async def ongoing_order_delete(parameters: dict, session: AsyncSession):
+def ongoing_order_delete(parameters: dict):
     global ongoing_orders
     session_id = parameters["session_id"].split('/')[-1]
     menu_items = list(parameters["menu-items"])
-    print(ongoing_orders)
-    print(session_id)
     if session_id in ongoing_orders.keys():
         existing_menu = ongoing_orders[session_id]
+        items_removed = []
+        items_cannot_remove = []
         for menu_item in menu_items:
-            _ = existing_menu.pop(menu_item)
-        ongoing_orders[session_id] = ongoing_orders[session_id]
-        return f"Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
+            if existing_menu.pop(menu_item, None) is None:
+                items_cannot_remove.append(menu_item)
+            else: 
+                items_removed.append(menu_item)
+        ongoing_orders[session_id] = existing_menu
+
+        removal_message = ""
+        if items_removed:
+            removal_message += "Removed: " + ", ".join(items_removed) + ". "
+        if items_cannot_remove:
+            removal_message += "Unable to remove: " + ", ".join(items_cannot_remove) + ". "
+        return_statement = removal_message + f"Your current order is: {utils.format_order(ongoing_orders[session_id])}. Anything else I can help you with?"
+        return return_statement
     else:
         return "Sorry had problem finding your order? Can you please repeat the order"
 
+
+def ongoing_order_delete_all(parameters: dict):
+    pass 
+
+def ongoing_order_get_details(parameters: dict):
+    pass
 
 async def ongoing_order_finalize(parameters: dict, session: AsyncSession):
     global ongoing_orders
@@ -99,6 +119,7 @@ intentHandler = {
     "ongoing-order.add":ongoing_order_add,
     "ongoing-order.delete":ongoing_order_delete,
     "ongoing-order.finalize":ongoing_order_finalize,
+    "ongoing_order.delete_all":ongoing_order_delete_all
 }
 
 app = FastAPI()
@@ -115,5 +136,13 @@ async def handle_dialogflow_request(request: Request, session: AsyncSession = De
     parameters = payload["queryResult"]["parameters"]
     parameters["session_id"] = payload["session"]
 
-    return JSONResponse(content={"fulfillmentText": await intentHandler[intent](parameters, session)})
- 
+    if intent=="ongoing-tracking.provide_id":
+        return JSONResponse(content={"fulfillmentText": await ongoing_tracking_provide_id(parameters, session)})
+    elif intent=="ongoing-order.add":
+        return JSONResponse(content={"fulfillmentText": ongoing_order_add(parameters)})
+    elif intent=="ongoing-order.delete":
+        return JSONResponse(content={"fulfillmentText": ongoing_order_delete(parameters)})
+    elif intent=="ongoing_order.delete_all":
+        return JSONResponse(content={"fulfillmentText": ongoing_order_delete_all(parameters)})
+    elif intent=="ongoing-order.finalize":
+        return JSONResponse(content={"fulfillmentText": await ongoing_order_finalize(parameters, session)})
