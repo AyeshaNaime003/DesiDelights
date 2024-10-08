@@ -80,3 +80,24 @@ BEGIN
     END IF;
 END;
 $$;
+
+-- Function to get id for an item
+DROP FUNCTION IF EXISTS get_id_for_item;
+CREATE FUNCTION get_id_for_item(p_item_name VARCHAR(255)) 
+RETURNS INT
+LANGUAGE plpgsql AS $$
+DECLARE
+    r_item_id INT;
+BEGIN
+    -- Check if the item_name exists in the menu_items table
+    SELECT item_id INTO r_item_id
+    FROM menu_items
+    WHERE name = p_item_name;
+    IF FOUND THEN
+        RETURN r_item_id;
+    ELSE
+        -- Invalid item_name, return -1
+        RETURN -1;
+    END IF;
+END;
+$$;
