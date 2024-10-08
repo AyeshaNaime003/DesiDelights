@@ -2,21 +2,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy import text
 from model import MenuItem, Order, OrderDetails
-from fastapi import FastAPI, Request, Depends
-from database import get_db
+
 def format_order_details_and_status(details, status):
     pass
 
 async def get_order_details(order_id, session: AsyncSession):
-    try:
-        # Create the query and execute
-        query = select(OrderDetails).where(OrderDetails.order_id == order_id)
-        result = await session.execute(query)
-        order_details = result.scalars().all()  
-        return order_details  
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return None  
+    query = (
+        select(MenuItem.name, OrderDetails.quantity, OrderDetails.total_price)
+        .join(MenuItem, OrderDetails.item_id == MenuItem.item_id)  # Joining on item_id
+        .where(OrderDetails.order_id == order_id)  # Filtering by order_id
+    )
+    result = await session.execute(query)
+    order_details = result.all()  # Fetch all results
+    return [
+        {"order_id": detail[0], "name": detail[0], "quantity": detail[1], "total_price": detail[2]}
+        for detail in order_details
+    ]
 
 
 async def get_order_status(order_id, session: AsyncSession):

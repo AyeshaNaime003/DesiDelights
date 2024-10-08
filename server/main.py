@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
-from model import Order, OrderDetails
 import db_utils
 import utils
 
@@ -12,11 +11,13 @@ ongoing_orders = {}
 async def ongoing_tracking_provide_id(parameters: dict, session: AsyncSession):
     order_id = int(parameters["number"])
     order_status = await db_utils.get_order_status(order_id, session)
+    order_details = await db_utils.get_order_details(order_id, session)
+    order_details = ", ".join([f"{order_detail['quantity']} {order_detail['name']}" for order_detail in order_details])
     return (
-        f"Order Id {order_id} is currently {order_status}. Thank you for your patience!" 
-        if order_status else 
-        "I'm sorry, but I couldn't find any details for your order. Please check the ID and try again."
-    )
+    f"Your order with ID {order_id} for {order_details} is currently in the {order_status} stage."
+    if order_status else
+    "Apologies, but we couldn't find any details associated with the order ID you provided. Please double-check the ID and try again.")
+
 
 def ongoing_order_create():
     return """Welcome to Our Menu! Explore our selection of delicious dishes and beverages
@@ -139,6 +140,11 @@ app = FastAPI()
 @app.get("/")
 async def root():
     return {"message": "Welcome to DesiDelights"}
+
+@app.get("/order-details/{order_id}")
+async def root(order_id: int, session: AsyncSession = Depends(get_db)):
+    result = await db_utils.get_order_details(order_id, session)
+    return {"result": result}
 
 @app.post("/")
 async def handle_dialogflow_request(request: Request, session: AsyncSession = Depends(get_db)):
