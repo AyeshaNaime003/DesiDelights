@@ -88,9 +88,6 @@ def ongoing_order_delete_all(parameters: dict):
         return "Sorry had problem finding your order? Can you please repeat the order"
 
 
-def ongoing_order_get_details(parameters: dict):
-    pass
-
 async def ongoing_order_finalize(parameters: dict, session: AsyncSession):
     global ongoing_orders
     session_id = parameters["session_id"].split('/')[-1]
@@ -141,11 +138,7 @@ app = FastAPI()
 async def root():
     return {"message": "Welcome to DesiDelights"}
 
-@app.get("/order-details/{order_id}")
-async def root(order_id: int, session: AsyncSession = Depends(get_db)):
-    result = await db_utils.get_order_details(order_id, session)
-    return {"result": result}
-
+# dialogflow's webhook requests
 @app.post("/")
 async def handle_dialogflow_request(request: Request, session: AsyncSession = Depends(get_db)):
     payload = await request.json()
@@ -170,3 +163,8 @@ async def handle_dialogflow_request(request: Request, session: AsyncSession = De
     elif intent=="ongoing-order.finalize":
         return JSONResponse(content={"fulfillmentText": await ongoing_order_finalize(parameters, session)})
     
+# getting the menu items for for display in frontend
+@app.get("/get_menu_items")
+async def get_menu_items(session: AsyncSession = Depends(get_db)):
+    menu_items = await db_utils.get_menu_items(session)
+    return JSONResponse(content={"menu_items":menu_items})

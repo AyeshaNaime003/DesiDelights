@@ -9,6 +9,8 @@ class MenuItem(Base):
     name = Column(String(255))
     description = Column(String(1000))
     price = Column(Numeric(10, 2))
+    category = Column(String(100), nullable=False)  # Category (e.g., main dish, drink, etc.)
+    image_url = Column(String(255), nullable=True)
 
     def __repr__(self):
         return f"MenuItem(id={self.item_id}, name={self.name}, price={self.price})"

@@ -3,9 +3,22 @@ from sqlalchemy.future import select
 from sqlalchemy import text
 from model import MenuItem, Order, OrderDetails
 
-def format_order_details_and_status(details, status):
-    pass
-
+async def get_menu_items(session: AsyncSession):
+    query = select(MenuItem.name, MenuItem.description, MenuItem.price, MenuItem.category, MenuItem.image_url)
+    menu_items  = await session.execute(query)
+    if menu_items:
+        return [
+            {
+                "name": str(menu_item[0]),
+                "description": str(menu_item[1]),
+                "price": float(menu_item[2]),
+                "category": str(menu_item[3]),
+                "image_url": str(menu_item[4])
+            }
+            for menu_item in menu_items
+        ]
+    else:
+        return None
 async def get_order_details(order_id, session: AsyncSession):
     query = (
         select(MenuItem.name, OrderDetails.quantity, OrderDetails.total_price)
