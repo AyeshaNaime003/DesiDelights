@@ -3,3 +3,4 @@ server/ngrok.exe
 server/ngrok.yml
 server/.env
 server/__pycache__
+screenshots/
