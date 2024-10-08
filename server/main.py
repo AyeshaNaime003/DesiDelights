@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
+from model import Order, OrderDetails
 import db_utils
 import utils
 
@@ -12,6 +13,7 @@ async def ongoing_tracking_provide_id(parameters: dict, session: AsyncSession):
     order_id = int(parameters["number"])
     order_status = await db_utils.get_order_status(order_id, session)
     return f"Order {order_id} is {order_status}" if order_status else "Sorry, couldn't find any details for your order."
+
 
 async def ongoing_order_add(parameters: dict, session: AsyncSession):
     global ongoing_orders
@@ -31,6 +33,7 @@ async def ongoing_order_add(parameters: dict, session: AsyncSession):
         print(f"\n\n{ongoing_orders}\n\n")
         return f"Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
     
+
 async def ongoing_order_delete(parameters: dict, session: AsyncSession):
     global ongoing_orders
     session_id = parameters["session_id"].split('/')[-1]
@@ -47,9 +50,49 @@ async def ongoing_order_delete(parameters: dict, session: AsyncSession):
         return "Sorry had problem finding your order? Can you please repeat the order"
 
 
+async def ongoing_order_finalize(parameters: dict, session: AsyncSession):
+    global ongoing_orders
+    session_id = parameters["session_id"].split('/')[-1]
+    menu = ongoing_orders[session_id]
+    if not menu:
+        return "No ongoing order found for this session."
+    
+    # calculate full price and make orders_details rows
+    total_bill = 0
+    order_details = []
+    for item, quantity in menu.items():
+        item_id = await db_utils.get_item_id(item, session)
+        item_price = await db_utils.get_item_price(item, session)
+        
+        if item_price is None:
+            return f"Sorry, we couldn't find the price for {item}."
+        if item_id is None:
+            return f"Sorry, we couldn't find the id for {item}."
 
-async def ongoing_order_finalize():
-    pass
+        item_total_price = item_price * quantity
+        total_bill += item_total_price
+        order_details.append((item_id, quantity, item_total_price))
+    
+    # add order
+    order_id = await db_utils.save_order(total_bill, session)
+    if order_id is None:
+        return "We encountered an issue while processing your order. Please try again or contact support."
+    
+    # Save the order details using the retrieved order ID
+    return_code = await db_utils.save_order_details(order_id, order_details, session)
+    if return_code is None:
+        return "We encountered an issue while processing your order. Please try again or contact support."
+    
+    formatted_order = utils.format_order(menu)
+    ongoing_orders.pop(session_id)
+    return (
+        f"Your order for {formatted_order} has been successfully placed!\n"
+        f"Order ID: {order_id}\n"
+        f"Total Bill: ${total_bill:.2f}\n"
+        "Your order is now being cooked and will be delivered within 20-30 minutes. "
+        "Please keep the cash ready for the delivery. Thank you for choosing us!"
+    )
+
 
 intentHandler = {
     "ongoing-tracking.provide_id":ongoing_tracking_provide_id,
@@ -73,8 +116,4 @@ async def handle_dialogflow_request(request: Request, session: AsyncSession = De
     parameters["session_id"] = payload["session"]
 
     return JSONResponse(content={"fulfillmentText": await intentHandler[intent](parameters, session)})
-       
-
-
-
  
