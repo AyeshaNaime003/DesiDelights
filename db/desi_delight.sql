@@ -10,17 +10,16 @@ CREATE TABLE menu_items (
   price DECIMAL(10,2)
 );
 
--- Inserting data into the menu_items table
 INSERT INTO menu_items (name, description, price) VALUES 
-('Biryani', 'One large plate of Sindhi Biryani with 2 chicken pieces.', 400),
-('Nihari', 'One large plate of Beef Nihari with 2 chicken pieces.', 400),
-('Daal Makhni', 'One large plate of Daal Makhni', 300),
-('Chicken Karahi', 'One large plate full of Chicken Karahi', 600),
-('Rasmalai', 'One bowl of rasmalai with 3 dumplings', 200),
-('Naan', 'Fresh Naan', 30),
-('Paratha', 'Lachedar Paratha', 50),
-('Soft Drink', 'Bottle of Pepsi', 75),
-('Lassi', 'Glass of Fresh Chilled Lassi', 100);
+('Biryani', 'A hearty serving of Sindhi Biryani topped with two tender chicken pieces.', 400),
+('Nihari', 'A rich and flavorful plate of Beef Nihari served with two pieces of chicken.', 400),
+('Daal Makhni', 'Creamy Daal Makhni, perfect for a comforting meal.', 300),
+('Chicken Karahi', 'Generous portion of Chicken Karahi, cooked to perfection.', 600),
+('Rasmalai', 'Delicate rasmalai served with three sweet dumplings in creamy milk.', 200),
+('Naan', 'Warm, freshly baked naan bread.', 30),
+('Paratha', 'Flaky and layered lachedar paratha.', 50),
+('Soft Drink', 'Chilled bottle of Pepsi to quench your thirst.', 75),
+('Lassi', 'Refreshing glass of chilled lassi, perfect for any meal.', 100);
 
 --
 -- Table structure for table `orders`
