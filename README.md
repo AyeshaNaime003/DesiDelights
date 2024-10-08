@@ -1,5 +1,8 @@
+ how the FastAPI endpoints work, the structure of the database (maybe with an ER diagram), and more about how the chatbot interacts with the API.
 # Desi Delights - Online Chatbot Resturant with FastAPI and PostgreSQL Database
-## Purpose
+## Summary
+This project is a full-stack restaurant chatbot solution built using FastAPI, PostgreSQL, and Google's DialogFlow. The chatbot allows customers to browse the menu, place and track orders, and finalize payments. The backend is powered by FastAPI for API communication, while DialogFlow handles natural language processing for smooth user interactions. All order and menu data is managed via a PostgreSQL database. Ngrok is used to secure communication between the API and chatbot.
+
 ## Features
 ## Components
 ### 1. PostgreSQL Database:
