@@ -14,7 +14,7 @@ singular_plural = {
     "Plate of Nihari":"Plates of Nihari",
     "Bowl of Rasmalai":"Bowls of Rasmalai",
     "Naan":"Naans",
-    "Paratha":"Paratahs",
+    "Paratha":"Parathas",
     "Soft Drink":"Soft Drinks",
     "Glass of Lassi":"Glasses of Lassi"
 }
