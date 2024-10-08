@@ -18,6 +18,18 @@ async def ongoing_tracking_provide_id(parameters: dict, session: AsyncSession):
         "I'm sorry, but I couldn't find any details for your order. Please check the ID and try again."
     )
 
+def ongoing_order_create():
+    return """Welcome to Our Menu! Explore our selection of delicious dishes and beverages
+    Biryani   PKR 400
+    Nihari   PKR 400
+    Daal Makhni   PKR 300
+    Chicken Karahi   PKR 600
+    Rasmalai   PKR 200
+    Naan   PKR 30
+    Paratha   PKR 50
+    Soft Drink   PKR 75
+    Lassi   PKR 100"""
+
 
 def ongoing_order_add(parameters: dict):
     global ongoing_orders
@@ -34,7 +46,6 @@ def ongoing_order_add(parameters: dict):
             ongoing_orders[session_id].update(new_menu)
         else:
             ongoing_orders[session_id] = new_menu    
-        print(f"\n\n{ongoing_orders}\n\n")
         return f"Items added Successfully. Order uptil now is {utils.format_order(ongoing_orders[session_id])}. Anything else?"
     
 
@@ -65,7 +76,16 @@ def ongoing_order_delete(parameters: dict):
 
 
 def ongoing_order_delete_all(parameters: dict):
-    pass 
+    print("in delete all")
+    global ongoing_orders
+    session_id = parameters["session_id"].split('/')[-1]
+    if session_id in ongoing_orders.keys():
+        ongoing_orders.pop(session_id, None)
+        print(f"\n\n{ongoing_orders}\n\n")
+        return f"All items were sucessfully removed, What would you like to add?"
+    else:
+        return "Sorry had problem finding your order? Can you please repeat the order"
+
 
 def ongoing_order_get_details(parameters: dict):
     pass
@@ -109,18 +129,10 @@ async def ongoing_order_finalize(parameters: dict, session: AsyncSession):
         f"Your order for {formatted_order} has been successfully placed!\n"
         f"Order ID: {order_id}\n"
         f"Total Bill: PKR{total_bill:.2f}\n"
-        "Your order is now being cooked and will be delivered within 20-30 minutes. "
-        "Please keep the cash ready for the delivery. Thank you for choosing us!"
+        "Your order is now being cooked and will be delivered within 20-30 minutes.\n "
+        "We only have Cash on Deliivery avaible, no online payments\n"
+        "Please keep the cash ready for the delivery. Thank you for choosing us!\n"
     )
-
-
-intentHandler = {
-    "ongoing-tracking.provide_id":ongoing_tracking_provide_id,
-    "ongoing-order.add":ongoing_order_add,
-    "ongoing-order.delete":ongoing_order_delete,
-    "ongoing-order.finalize":ongoing_order_finalize,
-    "ongoing_order.delete_all":ongoing_order_delete_all
-}
 
 app = FastAPI()
 
@@ -138,11 +150,17 @@ async def handle_dialogflow_request(request: Request, session: AsyncSession = De
 
     if intent=="ongoing-tracking.provide_id":
         return JSONResponse(content={"fulfillmentText": await ongoing_tracking_provide_id(parameters, session)})
+    elif intent=="ongoing-order.create":
+        if parameters["session_id"] in ongoing_orders.keys():
+            return JSONResponse(content={"fulfillmentText": ongoing_order_delete_all(parameters)})
+        else:
+            return JSONResponse(content={"fulfillmentText": ongoing_order_create()})
     elif intent=="ongoing-order.add":
         return JSONResponse(content={"fulfillmentText": ongoing_order_add(parameters)})
     elif intent=="ongoing-order.delete":
         return JSONResponse(content={"fulfillmentText": ongoing_order_delete(parameters)})
-    elif intent=="ongoing_order.delete_all":
+    elif intent=="ongoing-order.delete-all":
         return JSONResponse(content={"fulfillmentText": ongoing_order_delete_all(parameters)})
     elif intent=="ongoing-order.finalize":
         return JSONResponse(content={"fulfillmentText": await ongoing_order_finalize(parameters, session)})
+    

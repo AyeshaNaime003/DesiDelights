@@ -24,15 +24,11 @@ async def get_order_status(order_id, session: AsyncSession):
         # Create the query and execute
         query = select(Order.status).where(Order.order_id == order_id)
         result = await session.execute(query)
-        order_status = result.scalars().one_or_none()
-        return str(order_status) if order_status else None
+        order_status = result.scalar_one_or_none()
+        return order_status
     except Exception as e:
         print(f"An error occurred: {e}")
         return None 
-    
-def get_menu_items(session: AsyncSession):
-    pass
-
 
 async def get_item_id(item_name: str, session: AsyncSession):
     try:
