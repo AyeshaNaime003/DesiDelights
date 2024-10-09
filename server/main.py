@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Depends
 from fastapi.responses import JSONResponse
-
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncSession
 from database import get_db
 import db_utils
@@ -133,10 +134,9 @@ async def ongoing_order_finalize(parameters: dict, session: AsyncSession):
     )
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="../static"), name="static")
+templates = Jinja2Templates(directory="../templates")
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to DesiDelights"}
 
 # dialogflow's webhook requests
 @app.post("/")
@@ -164,7 +164,9 @@ async def handle_dialogflow_request(request: Request, session: AsyncSession = De
         return JSONResponse(content={"fulfillmentText": await ongoing_order_finalize(parameters, session)})
     
 # getting the menu items for for display in frontend
-@app.get("/get_menu_items")
-async def get_menu_items(session: AsyncSession = Depends(get_db)):
+@app.get("/")
+async def get_menu_items(request: Request, session: AsyncSession = Depends(get_db)):
     menu_items = await db_utils.get_menu_items(session)
-    return JSONResponse(content={"menu_items":menu_items})
+    # return JSONResponse(content={"menu_items":menu_items})
+    return templates.TemplateResponse("index.html", 
+                                      {"request": request, "menu_items": menu_items})

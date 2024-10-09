@@ -1,5 +1,5 @@
 .banner {
-    background-image: url('./assets/Banner.png'); /* Replace with your banner image URL */
+    background-image: url('../assets/Banner.png'); /* Replace with your banner image URL */
     background-size:  cover;
     background-repeat: 1;
 }
