@@ -1,4 +1,5 @@
 # __Desi Delights - Online Chatbot Resturant with FastAPI and PostgreSQL Database__
+Visit the static webite at: [https://ayeshanaime003.github.io/DesiDelights/]( https://ayeshanaime003.github.io/DesiDelights/)
 ![img](./static/assets/sc.png)
 ![img](./static/assets/sc2.png)
 ## Summary
