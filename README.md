@@ -1,4 +1,6 @@
 # __Desi Delights - Online Chatbot Resturant with FastAPI and PostgreSQL Database__
+![img](./static/assets/sc.png)
+![img](./static/assets/sc2.png)
 ## Summary
 This project is a full-stack chatbot solution for Desi Delights, a restaurant that allows customers to browse the menu of Pakistani Cuisinr, place orders, and track their status. 
 
