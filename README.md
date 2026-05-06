@@ -8,7 +8,7 @@ Chatbot development in DialogFlow:
 ![img](./static/assets/sc2.png)
 
 ## Summary
-This project is a full-stack chatbot solution for Desi Delights, a restaurant that allows customers to browse the menu of Pakistani Cuisinr, place orders, and track their status. 
+This project is a full-stack chatbot solution for Desi Delights, a restaurant that allows customers to browse the menu of Pakistani Cuisine, place orders, and track their status. 
 
 The frontend is built using HTML, Bootstrap, and Jinja2 for dynamic content rendering, while the backend is powered by FastAPI and PostgreSQL for efficient API communication. 
 
